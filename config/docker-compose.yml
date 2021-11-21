@@ -1,0 +1,78 @@
+version: '2'
+
+networks:
+  monitor:
+    driver: bridge
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: monitor-prometheus
+    hostname: prometheus
+    restart: always
+    volumes:
+      - /opt/docker/monitor/config/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '11001:9090'
+    networks:
+      - monitor
+
+
+  grafana:
+    image: grafana/grafana
+    container_name: monitor-grafana
+    hostname: grafana
+    restart: always
+    volumes:
+      - /opt/docker/monitor/data:/var/lib/grafana
+    ports:
+      - '11000:3000'
+    networks:
+      - monitor
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter
+    container_name: monitor-node-exporter
+    hostname: node-exporter
+    restart: always
+    ports:
+      - '11002:9100'
+    networks:
+      - monitor
+
+  process-exporter:
+    image: ncabatoff/process-exporter
+    container_name: monitor-process-exporter
+    hostname: node-exporter
+    restart: always
+    volumes:
+      - /proc:/host/proc
+      - /opt/docker/monitor/config:/config
+    command:
+      - '-procfs=/host/proc'
+      - '-config.path=/config/process-exporter.yml'
+    ports:
+      - '11003:9256'
+    networks:
+      - monitor
+  
+  cadvisor:
+    image: google/cadvisor
+    container_name: monitor-cadvisor
+    hostname: cadvisor
+    restart: always
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    ports:
+      - '11004:8080'
+    networks:
+      - monitor
+  
+  
+

@@ -1,0 +1,18 @@
+process_names:
+#    - name: "{{.Comm}}"
+#    cmdline:
+#    - '.+'
+   
+  - name: "{{.Matches}}"
+    cmdline:
+    - 'qemu'
+    
+  - name: "{{.ExeFull}}"
+    cmdline:
+    - '/lib/systemd/systemd-journald'
+    
+  - name: "{{.ExeFull}}"
+    cmdline:
+    - '/usr/bin/dockerd'
+    
+
